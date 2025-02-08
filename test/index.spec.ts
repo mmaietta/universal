@@ -2,7 +2,15 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { makeUniversalApp } from '../dist/cjs/index';
-import { appsDir, createTestApp, ensureUniversal, templateApp, verifyAllAsars } from './util';
+import {
+  appsDir,
+  createTestApp,
+  ensureUniversal,
+  templateApp,
+  verifyAllAsars,
+  verifyFileTree,
+  verifySmartUnpack,
+} from './util';
 import { createPackage } from '@electron/asar';
 
 const appsPath = path.resolve(__dirname, 'fixtures', 'apps');
@@ -150,11 +158,14 @@ describe('makeUniversalApp', () => {
         outAppPath,
       });
       await ensureUniversal(outAppPath);
-      expect(
-        (await fs.readdir(path.resolve(outAppPath, 'Contents', 'Resources')))
-          .filter((p) => p.startsWith('app'))
-          .sort(),
-      ).toEqual(['app', 'app-arm64', 'app-x64', 'app.asar'].sort());
+      const resourcesDir = path.resolve(outAppPath, 'Contents', 'Resources');
+      const appFolders = (await fs.readdir(resourcesDir)).filter((p) => p.startsWith('app')).sort();
+      expect(appFolders).toEqual(['app', 'app-arm64', 'app-x64', 'app.asar'].sort());
+
+      for await (const folder of appFolders.filter((f) => !f.endsWith('.asar'))) {
+        await verifyFileTree(path.join(resourcesDir, folder));
+      }
+      await verifySmartUnpack(path.join(resourcesDir, 'app.asar'));
     }, 60000);
   });
 

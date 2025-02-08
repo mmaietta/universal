@@ -38,8 +38,12 @@ export const verifySmartUnpack = async (
   if (!fs.existsSync(unpackedDirPath)) {
     return;
   }
-  const files = (await walk(unpackedDirPath)).map((it: string) => {
-    const name = toSystemIndependentPath(it.substring(unpackedDirPath.length + 1));
+  await verifyFileTree(unpackedDirPath);
+};
+
+export const verifyFileTree = async (dirPath: string) => {
+  const files = (await walk(dirPath)).map((it: string) => {
+    const name = toSystemIndependentPath(it.substring(dirPath.length + 1));
     if (it.endsWith('.txt') || it.endsWith('.json')) {
       return { name, content: fs.readFileSync(it, 'utf-8') };
     }
@@ -48,13 +52,13 @@ export const verifySmartUnpack = async (
   expect(files).toMatchSnapshot();
 };
 
-export async function ensureUniversal(app: string) {
+export const ensureUniversal = async (app: string) => {
   const exe = path.resolve(app, 'Contents', 'MacOS', 'Electron');
   const result = await spawn(exe);
   expect(result).toContain('arm64');
   const result2 = await spawn('arch', ['-x86_64', exe]);
   expect(result2).toContain('x64');
-}
+};
 
 // returns a list of all directories, files, and symlinks. Automates verifying Resources dir (both unpacked and packed)
 export const walk = (root: string): string[] => {
