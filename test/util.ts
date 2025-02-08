@@ -6,20 +6,42 @@ import * as zip from 'cross-zip';
 import * as fs from 'fs-extra';
 import { Dirent } from 'fs-extra';
 import * as path from 'path';
+import plist from 'plist';
 
 export const asarsDir = path.resolve(__dirname, 'fixtures', 'asars');
 export const appsDir = path.resolve(__dirname, 'fixtures', 'apps');
 
-export const verifyAllAsars = async (
+export const verifyApp = async (
   appPath: string,
   additionalVerifications?: (asarFilesystem: Filesystem) => Promise<void>,
 ) => {
+  await ensureUniversal(appPath);
+
   const resourcesDir = path.resolve(appPath, 'Contents', 'Resources');
-  const asars = (await fs.readdir(resourcesDir)).filter((p) => p.endsWith('.asar'));
+  const resourcesDirContents = await fs.readdir(resourcesDir, { withFileTypes: true });
+  const asars = resourcesDirContents.map((c) => c.path).filter((p) => p.endsWith('.asar'));
   // sort for consistent result
   for await (const asar of asars.sort()) {
+    // check both asar header and unpacked dir
     await verifySmartUnpack(path.resolve(resourcesDir, asar), additionalVerifications);
   }
+
+  const appDirs = resourcesDirContents
+    .filter((p) => p.path.includes('app') && !p.path.endsWith('.unpacked') && p.isDirectory())
+    .map((p) => p.path);
+
+  for await (const dir of appDirs) {
+    await verifyFileTree(path.resolve(resourcesDir, dir));
+  }
+
+  await verifyAsarIntegrityEntries(appPath);
+};
+
+export const verifyAsarIntegrityEntries = async (appPath: string) => {
+  const { ElectronAsarIntegrity: integrity, ...otherData } = plist.parse(
+    await fs.readFile(path.resolve(appPath, 'Contents', 'Info.plist'), 'utf-8'),
+  ) as any;
+  expect(integrity).toMatchSnapshot();
 };
 
 export const verifySmartUnpack = async (

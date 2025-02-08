@@ -29,6 +29,15 @@ exports[`makeUniversalApp asar mode should correctly merge two identical asars 1
 }
 `;
 
+exports[`makeUniversalApp asar mode should correctly merge two identical asars 2`] = `
+{
+  "Resources/app.asar": {
+    "algorithm": "SHA256",
+    "hash": "85fff474383bd8df11cd9c5784e8fcd1525af71ff140a8a882e1dc9d5b39fcbf",
+  },
+}
+`;
+
 exports[`makeUniversalApp asar mode should create a shim if asars are different between architectures 1`] = `
 {
   "files": {
@@ -127,6 +136,23 @@ exports[`makeUniversalApp asar mode should create a shim if asars are different 
 }
 `;
 
+exports[`makeUniversalApp asar mode should create a shim if asars are different between architectures 4`] = `
+{
+  "Resources/app-arm64.asar": {
+    "algorithm": "SHA256",
+    "hash": "71db54541357128943df64d54480a22d0cdf4c283f2044f48101fb1fc6e6fb2d",
+  },
+  "Resources/app-x64.asar": {
+    "algorithm": "SHA256",
+    "hash": "85fff474383bd8df11cd9c5784e8fcd1525af71ff140a8a882e1dc9d5b39fcbf",
+  },
+  "Resources/app.asar": {
+    "algorithm": "SHA256",
+    "hash": "b62aaaed07ff72dc33da1720d900e0443c060285ef374ce1bdaef1d4f28b5fe4",
+  },
+}
+`;
+
 exports[`makeUniversalApp asar mode should merge two different asars when \`mergeASARs\` is enabled 1`] = `
 {
   "files": {
@@ -152,6 +178,53 @@ exports[`makeUniversalApp asar mode should merge two different asars when \`merg
       },
       "size": 41,
     },
+  },
+}
+`;
+
+exports[`makeUniversalApp asar mode should merge two different asars when \`mergeASARs\` is enabled 2`] = `
+{
+  "Resources/app.asar": {
+    "algorithm": "SHA256",
+    "hash": "71db54541357128943df64d54480a22d0cdf4c283f2044f48101fb1fc6e6fb2d",
+  },
+}
+`;
+
+exports[`makeUniversalApp force packages successfully if \`out\` bundle already exists and \`force\` is \`true\` 1`] = `
+{
+  "files": {
+    "index.js": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+        ],
+        "hash": "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+      },
+      "size": 64,
+    },
+    "package.json": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+        ],
+        "hash": "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+      },
+      "size": 41,
+    },
+  },
+}
+`;
+
+exports[`makeUniversalApp force packages successfully if \`out\` bundle already exists and \`force\` is \`true\` 2`] = `
+{
+  "Resources/app.asar": {
+    "algorithm": "SHA256",
+    "hash": "85fff474383bd8df11cd9c5784e8fcd1525af71ff140a8a882e1dc9d5b39fcbf",
   },
 }
 `;

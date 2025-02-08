@@ -7,11 +7,10 @@ import {
   createTestApp,
   ensureUniversal,
   templateApp,
-  verifyAllAsars,
+  verifyApp,
   verifyFileTree,
   verifySmartUnpack,
 } from './util';
-import { createPackage } from '@electron/asar';
 
 const appsPath = path.resolve(__dirname, 'fixtures', 'apps');
 const appsOutPath = path.resolve(__dirname, 'fixtures', 'apps', 'out');
@@ -59,13 +58,7 @@ describe('makeUniversalApp', () => {
         outAppPath: out,
         force: true,
       });
-      await ensureUniversal(out);
-      // Only a single asar as they were identical
-      expect(
-        (await fs.readdir(path.resolve(out, 'Contents', 'Resources'))).filter((p) =>
-          p.endsWith('asar'),
-        ),
-      ).toEqual(['app.asar']);
+      await verifyApp(out);
     }, 60000);
   });
 
@@ -77,8 +70,7 @@ describe('makeUniversalApp', () => {
         arm64AppPath: path.resolve(appsPath, 'Arm64Asar.app'),
         outAppPath: out,
       });
-      await ensureUniversal(out);
-      verifyAllAsars(out);
+      await verifyApp(out);
     }, 60000);
 
     it('should create a shim if asars are different between architectures', async () => {
@@ -88,8 +80,7 @@ describe('makeUniversalApp', () => {
         arm64AppPath: path.resolve(appsPath, 'Arm64AsarExtraFile.app'),
         outAppPath: out,
       });
-      await ensureUniversal(out);
-      await verifyAllAsars(out);
+      await verifyApp(out);
     }, 60000);
 
     it('should merge two different asars when `mergeASARs` is enabled', async () => {
@@ -101,8 +92,7 @@ describe('makeUniversalApp', () => {
         mergeASARs: true,
         singleArchFiles: 'extra-file.txt',
       });
-      await ensureUniversal(out);
-      await verifyAllAsars(out);
+      await verifyApp(out);
     }, 60000);
 
     it('throws an error if `mergeASARs` is enabled and `singleArchFiles` is missing a unique file', async () => {
