@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { makeUniversalApp } from '../dist/cjs/index';
-import { ensureUniversal, verifyAllAsars, verifySmartUnpack } from './util';
+import { ensureUniversal, verifyAllAsars } from './util';
 
 const appsPath = path.resolve(__dirname, 'fixtures', 'apps');
 const appsOutPath = path.resolve(__dirname, 'fixtures', 'apps', 'out');

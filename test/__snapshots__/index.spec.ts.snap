@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`makeUniversalApp asar mode should correctly merge two identical asars 1`] = `
+{
+  "files": {
+    "index.js": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+        ],
+        "hash": "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+      },
+      "size": 64,
+    },
+    "package.json": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+        ],
+        "hash": "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+      },
+      "size": 41,
+    },
+  },
+}
+`;
+
+exports[`makeUniversalApp asar mode should create a shim if asars are different between architectures 1`] = `
+{
+  "files": {
+    "extra-file.txt": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "b8f261b95f81761658c8875b33a68001d8750fd898f447373bf6347e779bc3de",
+        ],
+        "hash": "b8f261b95f81761658c8875b33a68001d8750fd898f447373bf6347e779bc3de",
+      },
+      "size": 15,
+    },
+    "index.js": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+        ],
+        "hash": "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+      },
+      "size": 64,
+    },
+    "package.json": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+        ],
+        "hash": "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+      },
+      "size": 41,
+    },
+  },
+}
+`;
+
+exports[`makeUniversalApp asar mode should create a shim if asars are different between architectures 2`] = `
+{
+  "files": {
+    "index.js": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+        ],
+        "hash": "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+      },
+      "size": 64,
+    },
+    "package.json": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+        ],
+        "hash": "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+      },
+      "size": 41,
+    },
+  },
+}
+`;
+
+exports[`makeUniversalApp asar mode should create a shim if asars are different between architectures 3`] = `
+{
+  "files": {
+    "index.js": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "b7e5f58d3c0fddc1a57d1279a7f19a34a01784f4036920d4b60a1e33f6d1635b",
+        ],
+        "hash": "b7e5f58d3c0fddc1a57d1279a7f19a34a01784f4036920d4b60a1e33f6d1635b",
+      },
+      "size": 1068,
+    },
+    "package.json": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "2873266521e41d58d02e7acfbbbdb046edfa04b6ce262b8987de8e8548671fc7",
+        ],
+        "hash": "2873266521e41d58d02e7acfbbbdb046edfa04b6ce262b8987de8e8548671fc7",
+      },
+      "size": 33,
+    },
+  },
+}
+`;
+
+exports[`makeUniversalApp asar mode should merge two different asars when \`mergeASARs\` is enabled 1`] = `
+{
+  "files": {
+    "index.js": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+        ],
+        "hash": "8c8cefe616b330a70980c457e479360417a320f53f484d34df65227ce3add026",
+      },
+      "size": 64,
+    },
+    "package.json": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+        ],
+        "hash": "d6226276d47adc7aa20e6c46e842e258f5157313074a035051a89612acdd6be3",
+      },
+      "size": 41,
+    },
+  },
+}
+`;
