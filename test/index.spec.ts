@@ -2,15 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { makeUniversalApp } from '../dist/cjs/index';
-import {
-  appsDir,
-  createTestApp,
-  ensureUniversal,
-  templateApp,
-  verifyApp,
-  verifyFileTree,
-  verifySmartUnpack,
-} from './util';
+import { createTestApp, templateApp, verifyApp } from './util';
 
 const appsPath = path.resolve(__dirname, 'fixtures', 'apps');
 const appsOutPath = path.resolve(__dirname, 'fixtures', 'apps', 'out');
@@ -119,13 +111,7 @@ describe('makeUniversalApp', () => {
         arm64AppPath: path.resolve(appsPath, 'Arm64NoAsar.app'),
         outAppPath: out,
       });
-      await ensureUniversal(out);
-      // Only a single app folder as they were identical
-      expect(
-        (await fs.readdir(path.resolve(out, 'Contents', 'Resources'))).filter((p) =>
-          p.startsWith('app'),
-        ),
-      ).toEqual(['app']);
+      await verifyApp(out);
     }, 60000);
 
     it('should shim two different app folders', async () => {
@@ -147,15 +133,7 @@ describe('makeUniversalApp', () => {
         arm64AppPath,
         outAppPath,
       });
-      await ensureUniversal(outAppPath);
-      const resourcesDir = path.resolve(outAppPath, 'Contents', 'Resources');
-      const appFolders = (await fs.readdir(resourcesDir)).filter((p) => p.startsWith('app')).sort();
-      expect(appFolders).toEqual(['app', 'app-arm64', 'app-x64', 'app.asar'].sort());
-
-      for await (const folder of appFolders.filter((f) => !f.endsWith('.asar'))) {
-        await verifyFileTree(path.join(resourcesDir, folder));
-      }
-      await verifySmartUnpack(path.join(resourcesDir, 'app.asar'));
+      await verifyApp(outAppPath);
     }, 60000);
   });
 

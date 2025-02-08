@@ -27,7 +27,12 @@ export const verifyApp = async (
   }
 
   const appDirs = resourcesDirContents
-    .filter((p) => p.path.includes('app') && !p.path.endsWith('.unpacked') && p.isDirectory())
+    .filter(
+      (p) =>
+        path.basename(p.path).includes('app') &&
+        !path.basename(p.path).endsWith('.unpacked') &&
+        p.isDirectory(),
+    )
     .map((p) => p.path);
 
   for await (const dir of appDirs) {
