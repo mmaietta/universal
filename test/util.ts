@@ -7,6 +7,7 @@ import * as fs from 'fs-extra';
 import { Dirent } from 'fs-extra';
 import * as path from 'path';
 import plist from 'plist';
+import * as fileUtils from '../dist/cjs/file-utils';
 
 export const asarsDir = path.resolve(__dirname, 'fixtures', 'asars');
 export const appsDir = path.resolve(__dirname, 'fixtures', 'apps');
@@ -18,23 +19,19 @@ export const verifyApp = async (
   await ensureUniversal(appPath);
 
   const resourcesDir = path.resolve(appPath, 'Contents', 'Resources');
-  const resourcesDirContents = await fs.readdir(resourcesDir, { withFileTypes: true });
-  const asars = resourcesDirContents.map((c) => c.path).filter((p) => p.endsWith('.asar'));
+  const resourcesDirContents = await fs.readdir(resourcesDir);
+
   // sort for consistent result
-  for await (const asar of asars.sort()) {
-    // check both asar header and unpacked dir
-    await verifySmartUnpack(path.resolve(resourcesDir, asar), additionalVerifications);
+  const asars = resourcesDirContents.filter((p) => p.endsWith('.asar')).sort();
+  for await (const asar of asars) {
+    // check asar header and any other Filesystem verifications
+    await verifyHeader(path.resolve(resourcesDir, asar), additionalVerifications);
   }
 
+  // check all app and unpacked dirs
   const appDirs = resourcesDirContents
-    .filter(
-      (p) =>
-        path.basename(p.path).includes('app') &&
-        !path.basename(p.path).endsWith('.unpacked') &&
-        p.isDirectory(),
-    )
-    .map((p) => p.path);
-
+    .filter((p) => path.basename(p).includes('app') && !path.basename(p).endsWith('.asar'))
+    .sort();
   for await (const dir of appDirs) {
     await verifyFileTree(path.resolve(resourcesDir, dir));
   }
@@ -49,7 +46,7 @@ export const verifyAsarIntegrityEntries = async (appPath: string) => {
   expect(integrity).toMatchSnapshot();
 };
 
-export const verifySmartUnpack = async (
+export const verifyHeader = async (
   asarPath: string,
   additionalVerifications?: (asarFilesystem: Filesystem) => Promise<void>,
 ) => {
@@ -60,17 +57,13 @@ export const verifySmartUnpack = async (
 
   // verify header
   expect(removeUnstableProperties(asarFs.getHeader())).toMatchSnapshot();
-
-  const unpackedDirPath = `${asarPath}.unpacked`;
-  if (!fs.existsSync(unpackedDirPath)) {
-    return;
-  }
-  await verifyFileTree(unpackedDirPath);
 };
 
 export const verifyFileTree = async (dirPath: string) => {
-  const files = (await walk(dirPath)).map((it: string) => {
-    const name = toSystemIndependentPath(it.substring(dirPath.length + 1));
+  const dirFiles = await fileUtils.getAllAppFiles(dirPath);
+  const files = dirFiles.map((file) => {
+    const it = path.join(dirPath, file.relativePath);
+    const name = toSystemIndependentPath(file.relativePath);
     if (it.endsWith('.txt') || it.endsWith('.json')) {
       return { name, content: fs.readFileSync(it, 'utf-8') };
     }
@@ -85,22 +78,6 @@ export const ensureUniversal = async (app: string) => {
   expect(result).toContain('arm64');
   const result2 = await spawn('arch', ['-x86_64', exe]);
   expect(result2).toContain('x64');
-};
-
-// returns a list of all directories, files, and symlinks. Automates verifying Resources dir (both unpacked and app folders)
-export const walk = (root: string): string[] => {
-  const getPaths = (filepath: string, filter: (stat: Dirent) => boolean) =>
-    fs
-      .readdirSync(filepath, { withFileTypes: true })
-      .filter((dirent) => filter(dirent))
-      .map(({ name }) => path.join(filepath, name));
-
-  const dirs = getPaths(root, (dirent) => dirent.isDirectory());
-  const files = dirs.map((dir) => walk(dir)).flat();
-  return files.concat(
-    dirs,
-    getPaths(root, (dirent) => dirent.isFile() || dirent.isSymbolicLink()),
-  );
 };
 
 export function toSystemIndependentPath(s: string): string {
