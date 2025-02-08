@@ -60,7 +60,7 @@ export const ensureUniversal = async (app: string) => {
   expect(result2).toContain('x64');
 };
 
-// returns a list of all directories, files, and symlinks. Automates verifying Resources dir (both unpacked and packed)
+// returns a list of all directories, files, and symlinks. Automates verifying Resources dir (both unpacked and app folders)
 export const walk = (root: string): string[] => {
   const getPaths = (filepath: string, filter: (stat: Dirent) => boolean) =>
     fs

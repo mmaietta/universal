@@ -155,3 +155,92 @@ exports[`makeUniversalApp asar mode should merge two different asars when \`merg
   },
 }
 `;
+
+exports[`makeUniversalApp no asar mode should shim two different app folders 1`] = `
+[
+  "private/var/i-aint-got-no-rythm.bin",
+  "private/var",
+  "private",
+]
+`;
+
+exports[`makeUniversalApp no asar mode should shim two different app folders 2`] = `
+[
+  {
+    "content": "hello world",
+    "name": "private/var/app/file.txt",
+  },
+  "private/var/app",
+  {
+    "content": "hello world",
+    "name": "private/var/file.txt",
+  },
+  "private/var/i-aint-got-no-rythm.bin",
+  "private/var",
+  "private",
+  "index.js",
+  {
+    "content": "{
+  "name": "app",
+  "main": "index.js"
+}",
+    "name": "package.json",
+  },
+  "var",
+]
+`;
+
+exports[`makeUniversalApp no asar mode should shim two different app folders 3`] = `
+[
+  {
+    "content": "hello world",
+    "name": "private/var/app/file.txt",
+  },
+  "private/var/app",
+  {
+    "content": "hello world",
+    "name": "private/var/file.txt",
+  },
+  "private/var/hello-world.bin",
+  "private/var",
+  "private",
+  "index.js",
+  {
+    "content": "{
+  "name": "app",
+  "main": "index.js"
+}",
+    "name": "package.json",
+  },
+  "var",
+]
+`;
+
+exports[`makeUniversalApp no asar mode should shim two different app folders 4`] = `
+{
+  "files": {
+    "index.js": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "f1e14240f7c833900fca84fabc2f0ff27084efdf1c5b228b015515de3f8fa28e",
+        ],
+        "hash": "f1e14240f7c833900fca84fabc2f0ff27084efdf1c5b228b015515de3f8fa28e",
+      },
+      "size": 1063,
+    },
+    "package.json": {
+      "integrity": {
+        "algorithm": "SHA256",
+        "blockSize": 4194304,
+        "blocks": [
+          "2873266521e41d58d02e7acfbbbdb046edfa04b6ce262b8987de8e8548671fc7",
+        ],
+        "hash": "2873266521e41d58d02e7acfbbbdb046edfa04b6ce262b8987de8e8548671fc7",
+      },
+      "size": 33,
+    },
+  },
+}
+`;
