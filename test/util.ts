@@ -100,7 +100,10 @@ export function removeUnstableProperties(data: any) {
  * ├── package.json
  */
 let counter = 0;
-export const createTestApp = async (testName: string, additionalFiles: Record<string, string>) => {
+export const createTestApp = async (
+  testName: string,
+  additionalFiles: Record<string, string> = {},
+) => {
   const outDir = testName || 'app-' + counter++;
   const testPath = path.join(appsDir, outDir);
   await fs.remove(testPath);

@@ -114,7 +114,7 @@ describe('makeUniversalApp', () => {
   });
 
   describe('no asar mode', () => {
-    it.only('should correctly merge two identical app folders', async () => {
+    it('should correctly merge two identical app folders', async () => {
       const out = path.resolve(appsOutPath, 'MergedNoAsar.app');
       await makeUniversalApp({
         x64AppPath: path.resolve(appsPath, 'X64NoAsar.app'),
@@ -130,16 +130,16 @@ describe('makeUniversalApp', () => {
       ).toEqual(['app']);
     }, 60000);
 
-    it.only('should shim two different app folders', async () => {
+    it('should shim two different app folders', async () => {
       const arm64AppPath = await templateApp('ShimArm64.app', 'arm64', async (appPath) => {
         const { testPath } = await createTestApp('shimArm64', {
-          'i-aint-got-no-rhythm.txt': 'boomshakalaka',
+          'i-aint-got-no-rythm.bin': 'boomshakalaka',
         });
         await fs.copy(testPath, path.resolve(appPath, 'Contents', 'Resources', 'app'));
       });
 
       const x64AppPath = await templateApp('ShimX64.app', 'x64', async (appPath) => {
-        const { testPath } = await createTestApp('shimX64', { 'hello-world.txt': 'Hello World' });
+        const { testPath } = await createTestApp('shimX64', { 'hello-world.bin': 'Hello World' });
         await fs.copy(testPath, path.resolve(appPath, 'Contents', 'Resources', 'app'));
       });
 
@@ -154,7 +154,7 @@ describe('makeUniversalApp', () => {
         (await fs.readdir(path.resolve(outAppPath, 'Contents', 'Resources')))
           .filter((p) => p.startsWith('app'))
           .sort(),
-      ).toEqual(['app', 'app-arm64', 'app-x64'].sort());
+      ).toEqual(['app', 'app-arm64', 'app-x64', 'app.asar'].sort());
     }, 60000);
   });
 
