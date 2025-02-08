@@ -2,7 +2,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { makeUniversalApp } from '../dist/cjs/index';
-import { ensureUniversal, verifyAllAsars } from './util';
+import { appsDir, createTestApp, ensureUniversal, templateApp, verifyAllAsars } from './util';
+import { createPackage } from '@electron/asar';
 
 const appsPath = path.resolve(__dirname, 'fixtures', 'apps');
 const appsOutPath = path.resolve(__dirname, 'fixtures', 'apps', 'out');
@@ -113,7 +114,7 @@ describe('makeUniversalApp', () => {
   });
 
   describe('no asar mode', () => {
-    it('should correctly merge two identical app folders', async () => {
+    it.only('should correctly merge two identical app folders', async () => {
       const out = path.resolve(appsOutPath, 'MergedNoAsar.app');
       await makeUniversalApp({
         x64AppPath: path.resolve(appsPath, 'X64NoAsar.app'),
@@ -129,7 +130,32 @@ describe('makeUniversalApp', () => {
       ).toEqual(['app']);
     }, 60000);
 
-    it.todo('should shim two different app folders');
+    it.only('should shim two different app folders', async () => {
+      const arm64AppPath = await templateApp('ShimArm64.app', 'arm64', async (appPath) => {
+        const { testPath } = await createTestApp('shimArm64', {
+          'i-aint-got-no-rhythm.txt': 'boomshakalaka',
+        });
+        await fs.copy(testPath, path.resolve(appPath, 'Contents', 'Resources', 'app'));
+      });
+
+      const x64AppPath = await templateApp('ShimX64.app', 'x64', async (appPath) => {
+        const { testPath } = await createTestApp('shimX64', { 'hello-world.txt': 'Hello World' });
+        await fs.copy(testPath, path.resolve(appPath, 'Contents', 'Resources', 'app'));
+      });
+
+      const outAppPath = path.resolve(appsOutPath, 'ShimNoAsar.app');
+      await makeUniversalApp({
+        x64AppPath,
+        arm64AppPath,
+        outAppPath,
+      });
+      await ensureUniversal(outAppPath);
+      expect(
+        (await fs.readdir(path.resolve(outAppPath, 'Contents', 'Resources')))
+          .filter((p) => p.startsWith('app'))
+          .sort(),
+      ).toEqual(['app', 'app-arm64', 'app-x64'].sort());
+    }, 60000);
   });
 
   // TODO: Add tests for

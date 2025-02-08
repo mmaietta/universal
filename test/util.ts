@@ -1,8 +1,14 @@
 import { readFilesystemSync } from '@electron/asar/lib/disk';
 import { Filesystem } from '@electron/asar/lib/filesystem';
+import { downloadArtifact } from '@electron/get';
 import { spawn } from '@malept/cross-spawn-promise';
-import fs, { Dirent } from 'fs-extra';
-import path from 'path';
+import * as zip from 'cross-zip';
+import * as fs from 'fs-extra';
+import { Dirent } from 'fs-extra';
+import * as path from 'path';
+
+export const asarsDir = path.resolve(__dirname, '..', 'test', 'fixtures', 'asars');
+export const appsDir = path.resolve(__dirname, '..', 'test', 'fixtures', 'apps');
 
 export const verifyAllAsars = async (
   appPath: string,
@@ -80,3 +86,70 @@ export function removeUnstableProperties(data: any) {
     }),
   );
 }
+
+/**
+ * Directory structure:
+ * testName
+ * ├── private
+ * │   └── var
+ * │       ├── app
+ * │       │   └── file.txt -> ../file.txt
+ * │       └── file.txt
+ * └── var -> private/var
+ * ├── index.js
+ * ├── package.json
+ */
+let counter = 0;
+export const createTestApp = async (testName: string, additionalFiles: Record<string, string>) => {
+  const outDir = testName || 'app-' + counter++;
+  const testPath = path.join(appsDir, outDir);
+  await fs.remove(testPath);
+
+  await fs.copy(path.join(asarsDir, 'app'), testPath);
+
+  const privateVarPath = path.join(testPath, 'private', 'var');
+  const varPath = path.join(testPath, 'var');
+
+  await fs.mkdir(privateVarPath, { recursive: true });
+  await fs.symlink(path.relative(testPath, privateVarPath), varPath);
+
+  const files = {
+    'file.txt': 'hello world',
+    ...additionalFiles,
+  };
+  for await (const [filename, fileData] of Object.entries(files)) {
+    const originFilePath = path.join(varPath, filename);
+    await fs.writeFile(originFilePath, fileData);
+  }
+  const appPath = path.join(varPath, 'app');
+  await fs.mkdirp(appPath);
+  await fs.symlink('../file.txt', path.join(appPath, 'file.txt'));
+
+  return {
+    testPath,
+    varPath,
+    appPath,
+  };
+};
+
+export const templateApp = async (
+  name: string,
+  arch: string,
+  modify: (appPath: string) => Promise<void>,
+) => {
+  const cacheRoot = process.env.UNIVERSAL_CACHE_ROOT;
+  const electronZip = await downloadArtifact({
+    artifactName: 'electron',
+    version: '27.0.0',
+    platform: 'darwin',
+    arch,
+    cacheRoot,
+  });
+  const appPath = path.resolve(appsDir, name);
+  zip.unzipSync(electronZip, appsDir);
+  await fs.rename(path.resolve(appsDir, 'Electron.app'), appPath);
+  await fs.remove(path.resolve(appPath, 'Contents', 'Resources', 'default_app.asar'));
+  await modify(appPath);
+
+  return appPath;
+};
