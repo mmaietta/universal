@@ -201,64 +201,64 @@ export async function copyAndShimAsarIfNeeded(
     path.resolve(opts.arm64AppPath, 'Contents', 'Resources', 'app.asar'),
   );
 
-  if (x64AsarSha === arm64AsarSha) {
-    d('x64 and arm64 asars are the same');
-    generatedIntegrity['Resources/app.asar'] = generateAsarIntegrity(
-      path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar'),
-    );
-    return false;
-  }
+  if (x64AsarSha !== arm64AsarSha) {
+    d('x64 and arm64 asars are different');
+    const x64AsarPath = path.resolve(tmpApp, 'Contents', 'Resources', 'app-x64.asar');
+    await fs.move(path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar'), x64AsarPath);
+    const x64Unpacked = path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar.unpacked');
+    if (await fs.pathExists(x64Unpacked)) {
+      await fs.move(
+        x64Unpacked,
+        path.resolve(tmpApp, 'Contents', 'Resources', 'app-x64.asar.unpacked'),
+      );
+    }
 
-  d('x64 and arm64 asars are different');
-  const x64AsarPath = path.resolve(tmpApp, 'Contents', 'Resources', 'app-x64.asar');
-  await fs.move(path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar'), x64AsarPath);
-  const x64Unpacked = path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar.unpacked');
-  if (await fs.pathExists(x64Unpacked)) {
-    await fs.move(
-      x64Unpacked,
-      path.resolve(tmpApp, 'Contents', 'Resources', 'app-x64.asar.unpacked'),
-    );
-  }
-
-  const arm64AsarPath = path.resolve(tmpApp, 'Contents', 'Resources', 'app-arm64.asar');
-  await fs.copy(
-    path.resolve(opts.arm64AppPath, 'Contents', 'Resources', 'app.asar'),
-    arm64AsarPath,
-  );
-  const arm64Unpacked = path.resolve(
-    opts.arm64AppPath,
-    'Contents',
-    'Resources',
-    'app.asar.unpacked',
-  );
-  if (await fs.pathExists(arm64Unpacked)) {
+    const arm64AsarPath = path.resolve(tmpApp, 'Contents', 'Resources', 'app-arm64.asar');
     await fs.copy(
-      arm64Unpacked,
-      path.resolve(tmpApp, 'Contents', 'Resources', 'app-arm64.asar.unpacked'),
+      path.resolve(opts.arm64AppPath, 'Contents', 'Resources', 'app.asar'),
+      arm64AsarPath,
     );
+    const arm64Unpacked = path.resolve(
+      opts.arm64AppPath,
+      'Contents',
+      'Resources',
+      'app.asar.unpacked',
+    );
+    if (await fs.pathExists(arm64Unpacked)) {
+      await fs.copy(
+        arm64Unpacked,
+        path.resolve(tmpApp, 'Contents', 'Resources', 'app-arm64.asar.unpacked'),
+      );
+    }
+
+    const entryAsar = path.resolve(tmpDir, 'entry-asar');
+    await fs.mkdir(entryAsar);
+    await fs.copy(
+      path.resolve(__dirname, '..', '..', 'entry-asar', 'has-asar.js'),
+      path.resolve(entryAsar, 'index.js'),
+    );
+    let pj = JSON.parse(
+      asar
+        .extractFile(
+          path.resolve(opts.x64AppPath, 'Contents', 'Resources', 'app.asar'),
+          'package.json',
+        )
+        .toString('utf8'),
+    );
+    pj.main = 'index.js';
+    await fs.writeJson(path.resolve(entryAsar, 'package.json'), pj);
+    const asarPath = path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar');
+    await asar.createPackage(entryAsar, asarPath);
+
+    generatedIntegrity['Resources/app.asar'] = generateAsarIntegrity(asarPath);
+    generatedIntegrity['Resources/app-x64.asar'] = generateAsarIntegrity(x64AsarPath);
+    generatedIntegrity['Resources/app-arm64.asar'] = generateAsarIntegrity(arm64AsarPath);
+    return true;
   }
 
-  const entryAsar = path.resolve(tmpDir, 'entry-asar');
-  await fs.mkdir(entryAsar);
-  await fs.copy(
-    path.resolve(__dirname, '..', '..', 'entry-asar', 'has-asar.js'),
-    path.resolve(entryAsar, 'index.js'),
+  d('x64 and arm64 asars are the same');
+  generatedIntegrity['Resources/app.asar'] = generateAsarIntegrity(
+    path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar'),
   );
-  let pj = JSON.parse(
-    asar
-      .extractFile(
-        path.resolve(opts.x64AppPath, 'Contents', 'Resources', 'app.asar'),
-        'package.json',
-      )
-      .toString('utf8'),
-  );
-  pj.main = 'index.js';
-  await fs.writeJson(path.resolve(entryAsar, 'package.json'), pj);
-  const asarPath = path.resolve(tmpApp, 'Contents', 'Resources', 'app.asar');
-  await asar.createPackage(entryAsar, asarPath);
-
-  generatedIntegrity['Resources/app.asar'] = generateAsarIntegrity(asarPath);
-  generatedIntegrity['Resources/app-x64.asar'] = generateAsarIntegrity(x64AsarPath);
-  generatedIntegrity['Resources/app-arm64.asar'] = generateAsarIntegrity(arm64AsarPath);
-  return true;
+  return false;
 }
