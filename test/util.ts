@@ -7,8 +7,8 @@ import * as fs from 'fs-extra';
 import { Dirent } from 'fs-extra';
 import * as path from 'path';
 
-export const asarsDir = path.resolve(__dirname, '..', 'test', 'fixtures', 'asars');
-export const appsDir = path.resolve(__dirname, '..', 'test', 'fixtures', 'apps');
+export const asarsDir = path.resolve(__dirname, 'fixtures', 'asars');
+export const appsDir = path.resolve(__dirname, 'fixtures', 'apps');
 
 export const verifyAllAsars = async (
   appPath: string,
