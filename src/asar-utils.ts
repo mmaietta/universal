@@ -6,7 +6,7 @@ import path from 'path';
 import { minimatch } from 'minimatch';
 import os from 'os';
 import { d } from './debug';
-import { spawn } from '@malept/cross-spawn-promise';
+import { ExitCodeError, spawn } from '@malept/cross-spawn-promise';
 
 const LIPO = 'lipo';
 
@@ -78,9 +78,16 @@ function checkSingleArch(archive: string, file: string, allowList?: string): voi
 }
 
 export const getFileArch = async (filepath: string) => {
-  const result = await spawn('file', [filepath]);
-  const archStdOut = result.substring(result.indexOf(':') + 2, result.indexOf('\n'));
-  return archStdOut;
+  try {
+    return await spawn('file', ['--brief', '--no-pad', filepath]);
+  } catch (e) {
+    if (e instanceof ExitCodeError) {
+      /* silently accept error codes from "file" */
+    } else {
+      throw e;
+    }
+  }
+  return '';
 };
 
 export const mergeASARs = async ({
