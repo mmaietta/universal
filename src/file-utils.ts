@@ -37,7 +37,7 @@ export const getAllAppFiles = async (appPath: string): Promise<AppFile[]> => {
 
       if (p.includes('app.asar')) {
         fileType = AppFileType.APP_CODE;
-      } else if ((await getFileArch(p))?.startsWith?.(MACHO_PREFIX)) {
+      } else if ((await getFileArch(p)).startsWith(MACHO_PREFIX)) {
         fileType = AppFileType.MACHO;
       } else if (p.endsWith('.bin')) {
         fileType = AppFileType.SNAPSHOT;
