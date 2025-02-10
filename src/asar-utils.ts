@@ -78,8 +78,9 @@ function checkSingleArch(archive: string, file: string, allowList?: string): voi
 }
 
 export const getFileArch = async (filepath: string) => {
+  let fileOutput = '';
   try {
-    return await spawn('file', ['--brief', '--no-pad', filepath]);
+    fileOutput = await spawn('file', ['--brief', '--no-pad', filepath]);
   } catch (e) {
     if (e instanceof ExitCodeError) {
       /* silently accept error codes from "file" */
@@ -87,7 +88,12 @@ export const getFileArch = async (filepath: string) => {
       throw e;
     }
   }
-  return '';
+  const multiLineIndex = fileOutput.indexOf('\n');
+  const archStdOut = fileOutput.substring(
+    fileOutput.indexOf(':') + 1,
+    multiLineIndex > -1 ? multiLineIndex : undefined,
+  );
+  return archStdOut;
 };
 
 export const mergeASARs = async ({

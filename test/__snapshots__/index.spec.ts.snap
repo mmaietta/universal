@@ -317,7 +317,7 @@ exports[`makeUniversalApp no asar mode identical app dirs with different macho f
 [
   "index.js",
   {
-    "arch": "Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit bundle x86_64] [arm64:Mach-O 64-bit bundle arm64]",
+    "arch": " [x86_64:Mach-O 64-bit bundle x86_64] [arm64:Mach-O 64-bit bundle arm64]",
     "name": "node-mac-permissions.node",
   },
   {
@@ -340,7 +340,7 @@ exports[`makeUniversalApp no asar mode identical app dirs with universal macho f
 [
   "index.js",
   {
-    "arch": "Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit bundle x86_64] [arm64:Mach-O 64-bit bundle arm64]",
+    "arch": " [x86_64:Mach-O 64-bit bundle x86_64] [arm64:Mach-O 64-bit bundle arm64]",
     "name": "node-mac-permissions.node",
   },
   {
@@ -487,7 +487,7 @@ exports[`makeUniversalApp works for lipo binary resources 1`] = `
 exports[`makeUniversalApp works for lipo binary resources 2`] = `
 [
   {
-    "arch": "Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit bundle x86_64] [arm64:Mach-O 64-bit bundle arm64]",
+    "arch": " [x86_64:Mach-O 64-bit bundle x86_64] [arm64:Mach-O 64-bit bundle arm64]",
     "name": "node-mac-permissions.node",
   },
 ]
